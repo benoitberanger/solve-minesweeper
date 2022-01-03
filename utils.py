@@ -1,6 +1,17 @@
+from PIL import ImageGrab
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+
+
+def take_screenshot(convert_grayscale):
+    screenshot = ImageGrab.grab()
+    image_rgb = np.array(screenshot)
+    if convert_grayscale:
+        image = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
+    else:
+        image = image_rgb
+    return image
 
 
 def load_img(path, convert_grayscale):

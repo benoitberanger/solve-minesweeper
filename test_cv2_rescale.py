@@ -6,19 +6,14 @@ from matplotlib import pyplot as plt
 import utils
 import logging
 
-logging.basicConfig(format='[%(asctime)s] %(message)s', datefmt='%Y/%d/%m %I:%M:%S', level=logging.INFO)
+logging.basicConfig(format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%Y/%d/%m %I:%M:%S', level=logging.INFO)
 logging.info('START')
 
 convert_grayscale = 1
 
 # screenshot
 logging.info('Screenshot')
-screenshot_all = ImageGrab.grab()
-image_rgb = np.array(screenshot_all)
-if convert_grayscale:
-    image = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
-else:
-    image = image_rgb
+image = utils.take_screenshot(convert_grayscale)
 
 # face image recognition
 logging.info('Loading "FACE" image')
@@ -29,6 +24,7 @@ face_pos = face_pos + face_dim/2  # to be at the center
 
 # reset -> click on th face
 pyautogui.leftClick(face_pos[1], face_pos[0])
+image = utils.take_screenshot(convert_grayscale)  # reset input image
 
 # grid location
 logging.info('Loading "TILE" image')
