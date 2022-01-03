@@ -26,7 +26,7 @@ def locate_face(image, template, scales=np.arange(1,10,0.2), threshold_low=0.7, 
                 result, dim_high = resize_and_match(image, template, small_scale)
                 map_high = np.argwhere(result > threshold_high)
                 if map_high.any() and map_high.shape[0]==1:
-                    return map_high, dim_high
+                    return map_high[0], np.array(dim_high)
 
 
 def resize_and_match(image, template, factor):
@@ -55,7 +55,7 @@ def locate_tiles(image, template, scales=np.arange(1,10,0.2), threshold_low=0.90
                 result, dim_high = resize_and_match(image, template, small_scale)
                 map_high = np.argwhere(result > threshold_high)
                 if map_high.any():
-                    return map_high, dim_high
+                    return map_high, np.array(dim_high)
 
 def get_good_pos(array):
     array_clean = np.sort(np.unique(array))
