@@ -16,17 +16,17 @@ def locate_face(image, template, scales=np.arange(1,10,0.2), threshold_low=0.7, 
 
     # small scale test
     for scale in scales:
-        result = resize_and_match(image, template, scale)
+        result, _ = resize_and_match(image, template, scale)
         map_low = np.argwhere(result > threshold_low)
         if map_low.any():
             dist = scales[1]-scales[0]
 
             # precise scale test
             for small_scale in np.arange(scale-dist, scale+dist, dist/10):
-                result = resize_and_match(image, template, small_scale)
+                result, dim_high = resize_and_match(image, template, small_scale)
                 map_high = np.argwhere(result > threshold_high)
                 if map_high.any() and map_high.shape[0]==1:
-                    return map_high
+                    return map_high, dim_high
 
 
 def resize_and_match(image, template, factor):
@@ -39,14 +39,28 @@ def resize_and_match(image, template, factor):
 
     result = cv2.matchTemplate(image, resized, cv2.TM_CCOEFF_NORMED)
 
-    return result
+    return result, dim
 
 
-def locate_grid(image, template, scales=np.arange(1,10,0.2), threshold=0.9):
+def locate_tiles(image, template, scales=np.arange(1,10,0.2), threshold_low=0.90, threshold_high=0.99):
     # small scale test
     for scale in scales:
-        result = resize_and_match(image, template, scale)
-        grid = np.argwhere(result > threshold)
-        if grid.any():
-            return grid
+        result, _ = resize_and_match(image, template, scale)
+        map_low = np.argwhere(result > threshold_low)
+        if map_low.any():
+            dist = scales[1] - scales[0]
+
+            # precise scale test
+            for small_scale in np.arange(scale - dist, scale + dist, dist / 10):
+                result, dim_high = resize_and_match(image, template, small_scale)
+                map_high = np.argwhere(result > threshold_high)
+                if map_high.any():
+                    return map_high, dim_high
+
+def get_good_pos(array):
+    array_clean = np.sort(np.unique(array))
+    return array_clean
+
+
+
 
