@@ -41,6 +41,8 @@ grid_size_h = len(tiles_h_clean)
 grid_size_w = len(tiles_w_clean)
 logging.info(f'grid size = ({grid_size_h},{grid_size_w})')
 
-
-
+tiles_pos_2d = np.ndarray((grid_size_h,grid_size_w), dtype=object)
+for i in range(grid_size_h):
+    for j in range(grid_size_w):
+        tiles_pos_2d[i][j] = (tiles_h_clean[i], tiles_w_clean[j])
 0
