@@ -10,6 +10,7 @@ from classes import *
 screenshot = Screenshot()
 screenshot.take_it()
 print(screenshot)
+screenshot.show()
 
 quit()
 
