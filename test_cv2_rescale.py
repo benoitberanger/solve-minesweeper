@@ -5,6 +5,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 import utils
 import logging
+from classes import *
+
+screenshot = Screenshot()
+screenshot.take_it()
+print(screenshot)
+
+quit()
 
 logging.basicConfig(format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%Y/%d/%m %I:%M:%S', level=logging.INFO)
 logging.info('START')
