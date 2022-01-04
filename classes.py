@@ -60,7 +60,7 @@ class Zone:
         return str(self.__dict__)
 
     def click(self):
-        pyautogui.click(self.center.x, self.center.y)
+        pyautogui.click(self.center.y, self.center.x)
 
 
 class Image(Zone):
@@ -92,9 +92,6 @@ class Screenshot(Image):
 
         # convert rbg to grayscale
         image_gs = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
-
-        # transpose because height & width have been reversed
-        image_gs = image_gs.transpose()
 
         # store previous screenshot & save 'dim' and 'center'
         if self.img_curr.size == 0:
