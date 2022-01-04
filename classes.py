@@ -1,8 +1,11 @@
 import numpy as np
+import pyautogui
 from PIL import ImageGrab
 import cv2
 from matplotlib import pyplot as plt
 import utils
+import logging
+import sys
 
 empty_scalar = np.empty([1, 1]).fill(np.nan)
 
@@ -56,6 +59,9 @@ class Zone:
     def __repr__(self):
         return str(self.__dict__)
 
+    def click(self):
+        pyautogui.click(self.center.x, self.center.y)
+
 
 class Image(Zone):
     def __init__(self):
@@ -86,6 +92,9 @@ class Screenshot(Image):
 
         # convert rbg to grayscale
         image_gs = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
+
+        # transpose because height & width have been reversed
+        image_gs = image_gs.transpose()
 
         # store previous screenshot & save 'dim' and 'center'
         if self.img_curr.size == 0:
@@ -122,6 +131,7 @@ class Face(Image):
             result, _ = utils.resize_and_match(img_screenshot, self.img_face_ok, scale)
             map_low = np.argwhere(result > threshold_low)
             if map_low.any():
+                logging.info('roughly found "face_ok"')
                 dist = scales[1] - scales[0]
 
                 # precise scale test
@@ -129,8 +139,14 @@ class Face(Image):
                     result, dim_high = utils.resize_and_match(img_screenshot, self.img_face_ok, small_scale)
                     map_high = np.argwhere(result > threshold_high)
                     if map_high.any() and map_high.shape[0] == 1:
+                        logging.info('precisely found "face_ok"')
                         self.pos.xy = map_high[0]
                         self.center.xy = map_high[0] + np.array(dim_high)/2
+                        return
+                logging.warning('**NOT** precisely found "face_ok"')
+                sys.exit()
+        logging.warning('**NOT** roughly found "face_ok"')
+        sys.exit()
 
 
 class Tile(Image):
