@@ -25,33 +25,19 @@ face.load_face_ko('media/face2.png')
 logging.info('locating face')
 face.locate(screenshot.img_curr)
 
+# make sure it's reseted
 face.click()
 
-quit()
-
-# reset -> click on th face
-pyautogui.leftClick(face_pos[1], face_pos[0])
-image = utils.take_screenshot(convert_grayscale)  # reset input image
-
 # grid location
+grid = Grid()
+
 logging.info('Loading "TILE" image')
-template_tile = utils.load_img('media/t-3.png', convert_grayscale)
-logging.info('locate_grid()')
-tiles_pos, tile_dim = utils.locate_tiles(image, template_tile)
+grid.load_tile('media/t-3.png')
 
-tiles_h = tiles_pos[:, 0]
-tiles_w = tiles_pos[:, 1]
+logging.info('locating grid')
+grid.locate(screenshot.img_curr)
 
-tiles_h_clean = utils.get_good_pos(tiles_h)
-tiles_w_clean = utils.get_good_pos(tiles_w)
-grid_size_h = len(tiles_h_clean)
-grid_size_w = len(tiles_w_clean)
-logging.info(f'grid size = ({grid_size_h},{grid_size_w})')
-
-tiles_pos_2d = np.ndarray((grid_size_h,grid_size_w), dtype=object)
-for i in range(grid_size_h):
-    for j in range(grid_size_w):
-        tiles_pos_2d[i][j] = (tiles_h_clean[i], tiles_w_clean[j]) + tile_dim/2
+quit()
 
 # reset -> click on th face
 pyautogui.leftClick(face_pos[1], face_pos[0])

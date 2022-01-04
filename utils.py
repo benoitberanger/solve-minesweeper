@@ -36,7 +36,3 @@ def locate_tiles(image, template, scales=np.arange(1,10,0.2), threshold_low=0.90
 def get_good_pos(array):
     array_clean = np.sort(np.unique(array))
     return array_clean
-
-
-
-

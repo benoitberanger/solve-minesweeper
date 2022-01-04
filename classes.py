@@ -153,6 +153,62 @@ class Tile(Image):
 
 class Grid:
     def __init__(self):
-        self.Zone = Zone
-        self.Tiles = np.ndarray
+        self.grid_size_h = empty_scalar
+        self.grid_size_w = empty_scalar
 
+        self.tiles_pos_2d = np.ndarray([])
+
+        self.fname_tile = ''
+        self.img_tile = np.ndarray([])
+
+        self.Tiles = np.ndarray([])
+
+    def __repr__(self):
+        return str(self.__dict__)
+
+    def load_tile(self, fname):
+        self.fname_tile = fname
+        img_rgb = cv2.imread(fname)
+        self.img_tile = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+
+    def locate(self, img_screenshot, scales=np.arange(1, 10, 0.2), threshold_low=0.90, threshold_high=0.99):
+
+        # small scale test
+        for scale in scales:
+            result, _ = utils.resize_and_match(img_screenshot, self.img_tile, scale)
+            map_low = np.argwhere(result > threshold_low)
+            if map_low.any():
+                logging.info('roughly found "tile"')
+                dist = scales[1] - scales[0]
+
+                # precise scale test
+                for small_scale in np.arange(scale - dist, scale + dist, dist / 10):
+                    result, dim_high = utils.resize_and_match(img_screenshot, self.img_tile, small_scale)
+                    map_high = np.argwhere(result > threshold_high)
+                    if map_high.any():
+
+                        logging.info('precisely found "tile"')
+
+                        tiles_pos = map_high
+                        tile_dim = np.array(dim_high)
+
+                        tiles_h = tiles_pos[:, 0]
+                        tiles_w = tiles_pos[:, 1]
+
+                        tiles_h_clean = utils.get_good_pos(tiles_h)
+                        tiles_w_clean = utils.get_good_pos(tiles_w)
+                        self.grid_size_h = len(tiles_h_clean)
+                        self.grid_size_w = len(tiles_w_clean)
+                        logging.info(f'grid size = ({self.grid_size_h},{self.grid_size_w})')
+
+                        self.tiles_pos_2d = np.ndarray([self.grid_size_h, self.grid_size_w], dtype=object)
+                        for i in range(self.grid_size_h):
+                            for j in range(self.grid_size_w):
+                                self.tiles_pos_2d[i][j] = (tiles_h_clean[i], tiles_w_clean[j]) + tile_dim / 2
+                        return
+
+                logging.warning('**NOT** precisely found "tile"')
+                sys.exit()
+
+        logging.warning('**NOT** roughly found "tile"')
+        sys.exit()
