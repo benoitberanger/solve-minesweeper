@@ -24,6 +24,7 @@ face.load_face_ko('media/face2.png')
 
 logging.info('locating face')
 face.locate(screenshot.img_curr)
+face.scale_face_ko()
 
 # make sure it's reseted
 face.click()
@@ -37,12 +38,4 @@ grid.load_tile('media/t-3.png')
 logging.info('locating grid')
 grid.locate(screenshot.img_curr)
 
-quit()
 
-# reset -> click on th face
-pyautogui.leftClick(face_pos[1], face_pos[0])
-
-# click in the center tile
-idx_middle_h = round(grid_size_h/2)
-idx_middle_w = round(grid_size_w/2)
-pyautogui.leftClick(tiles_pos_2d[idx_middle_h][idx_middle_w][1], tiles_pos_2d[idx_middle_h][idx_middle_w][0])

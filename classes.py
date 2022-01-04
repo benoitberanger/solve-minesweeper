@@ -112,6 +112,9 @@ class Face(Image):
         self.fname_face_ko = ''
         self.img_face_ok = np.array([])
         self.img_face_ko = np.array([])
+        self.dim_scaled = Point()
+        self.img_face_ok_scaled = np.array([])
+        self.img_face_ko_scaled = np.array([])
 
     def load_face_ok(self, fname):
         self.fname_face_ok = fname
@@ -125,7 +128,7 @@ class Face(Image):
 
         # small scale test
         for scale in scales:
-            result, _ = utils.resize_and_match(img_screenshot, self.img_face_ok, scale)
+            result, _, _ = utils.resize_and_match(img_screenshot, self.img_face_ok, scale)
             map_low = np.argwhere(result > threshold_low)
             if map_low.any():
                 logging.info('roughly found "face_ok"')
@@ -133,17 +136,22 @@ class Face(Image):
 
                 # precise scale test
                 for small_scale in np.arange(scale - dist, scale + dist, dist / 10):
-                    result, dim_high = utils.resize_and_match(img_screenshot, self.img_face_ok, small_scale)
+                    result, template_high, dim_high = utils.resize_and_match(img_screenshot, self.img_face_ok, small_scale)
                     map_high = np.argwhere(result > threshold_high)
                     if map_high.any() and map_high.shape[0] == 1:
                         logging.info('precisely found "face_ok"')
                         self.pos.xy = map_high[0]
                         self.center.xy = map_high[0] + np.array(dim_high)/2
+                        self.img_face_ok_scaled = template_high
+                        self.dim_scaled.xy = dim_high
                         return
                 logging.warning('**NOT** precisely found "face_ok"')
                 sys.exit()
         logging.warning('**NOT** roughly found "face_ok"')
         sys.exit()
+
+    def scale_face_ko(self):
+        self.img_face_ko_scaled = cv2.resize(self.img_face_ko, self.dim_scaled.xy)
 
 
 class Tile(Image):
@@ -161,6 +169,9 @@ class Grid:
         self.fname_tile = ''
         self.img_tile = np.ndarray([])
 
+        self.img_tile_scaled = np.ndarray([])
+        self.dim_scaled = Point()
+
         self.Tiles = np.ndarray([])
 
     def __repr__(self):
@@ -175,7 +186,7 @@ class Grid:
 
         # small scale test
         for scale in scales:
-            result, _ = utils.resize_and_match(img_screenshot, self.img_tile, scale)
+            result, _, _ = utils.resize_and_match(img_screenshot, self.img_tile, scale)
             map_low = np.argwhere(result > threshold_low)
             if map_low.any():
                 logging.info('roughly found "tile"')
@@ -183,11 +194,14 @@ class Grid:
 
                 # precise scale test
                 for small_scale in np.arange(scale - dist, scale + dist, dist / 10):
-                    result, dim_high = utils.resize_and_match(img_screenshot, self.img_tile, small_scale)
+                    result, template_high, dim_high = utils.resize_and_match(img_screenshot, self.img_tile, small_scale)
                     map_high = np.argwhere(result > threshold_high)
                     if map_high.any():
 
                         logging.info('precisely found "tile"')
+
+                        self.img_tile_scaled = template_high
+                        self.dim_scaled.xy = dim_high
 
                         tiles_pos = map_high
                         tile_dim = np.array(dim_high)
