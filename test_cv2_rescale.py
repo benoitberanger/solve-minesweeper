@@ -7,28 +7,22 @@ import utils
 import logging
 from classes import *
 
-screenshot = Screenshot()
-screenshot.take_it()
-print(screenshot)
-screenshot.show()
-
-quit()
-
 logging.basicConfig(format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%Y/%d/%m %I:%M:%S', level=logging.INFO)
 logging.info('START')
 
-convert_grayscale = 1
-
-# screenshot
 logging.info('Screenshot')
-image = utils.take_screenshot(convert_grayscale)
+screenshot = Screenshot()
+screenshot.take_it()
 
-# face image recognition
+face = Face()
 logging.info('Loading "FACE" image')
-template_face = utils.load_img('media/face0.png', convert_grayscale)
-logging.info('locate_face()')
-face_pos, face_dim = utils.locate_face(image, template_face)
-face_pos = face_pos + face_dim/2  # to be at the center
+face.load_face_ok('media/face0.png')
+face.load_face_ko('media/face2.png')
+logging.info('locating face')
+face.locate(screenshot.img_curr)
+
+
+quit()
 
 # reset -> click on th face
 pyautogui.leftClick(face_pos[1], face_pos[0])
