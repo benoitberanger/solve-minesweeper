@@ -33,9 +33,14 @@ face.click()
 grid = Grid()
 
 logging.info('Loading "TILE" image')
-grid.load_tile('media/t-3.png')
+grid.load_tile_u('media/t-3.png')
+grid.load_tile_t0('media/t0.png')
+grid.load_tile_t1('media/t1.png')
+grid.load_tile_t2('media/t2.png')
+grid.load_tile_t3('media/t3.png')
 
 logging.info('locating grid')
 grid.locate(screenshot.img_curr)
+grid.scale_tiles()
 
-
+quit()

@@ -166,27 +166,60 @@ class Grid:
 
         self.tiles_pos_2d = np.ndarray([])
 
-        self.fname_tile = ''
-        self.img_tile = np.ndarray([])
+        self.fname_tile_u  = ''
+        self.fname_tile_t0 = ''
+        self.fname_tile_t1 = ''
+        self.fname_tile_t2 = ''
+        self.fname_tile_t3 = ''
+        self.img_tile_u  = np.ndarray([])
+        self.img_tile_t0 = np.ndarray([])
+        self.img_tile_t1 = np.ndarray([])
+        self.img_tile_t2 = np.ndarray([])
+        self.img_tile_t3 = np.ndarray([])
 
-        self.img_tile_scaled = np.ndarray([])
         self.dim_scaled = Point()
+        self.img_tile_scaled_u = np.ndarray([])
+        self.img_tile_scaled_t0 = np.ndarray([])
+        self.img_tile_scaled_t1 = np.ndarray([])
+        self.img_tile_scaled_t2 = np.ndarray([])
+        self.img_tile_scaled_t3 = np.ndarray([])
 
         self.Tiles = np.ndarray([])
 
     def __repr__(self):
         return str(self.__dict__)
 
-    def load_tile(self, fname):
-        self.fname_tile = fname
+    @staticmethod
+    def __load_tile(fname):
         img_rgb = cv2.imread(fname)
-        self.img_tile = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+        img_tile = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+        return img_tile
+
+    def load_tile_u(self, fname):
+        self.fname_tile_u = fname
+        self.img_tile_u =  self.__load_tile(fname)
+
+    def load_tile_t0(self, fname):
+        self.fname_tile_t0 = fname
+        self.img_tile_t0 = self.__load_tile(fname)
+
+    def load_tile_t1(self, fname):
+        self.fname_tile_t1 = fname
+        self.img_tile_t1 = self.__load_tile(fname)
+
+    def load_tile_t2(self, fname):
+        self.fname_tile_t2 = fname
+        self.img_tile_t2 = self.__load_tile(fname)
+
+    def load_tile_t3(self, fname):
+        self.fname_tile_t3 = fname
+        self.img_tile_t3 = self.__load_tile(fname)
 
     def locate(self, img_screenshot, scales=np.arange(1, 10, 0.2), threshold_low=0.90, threshold_high=0.99):
 
         # small scale test
         for scale in scales:
-            result, _, _ = utils.resize_and_match(img_screenshot, self.img_tile, scale)
+            result, _, _ = utils.resize_and_match(img_screenshot, self.img_tile_u, scale)
             map_low = np.argwhere(result > threshold_low)
             if map_low.any():
                 logging.info('roughly found "tile"')
@@ -194,13 +227,13 @@ class Grid:
 
                 # precise scale test
                 for small_scale in np.arange(scale - dist, scale + dist, dist / 10):
-                    result, template_high, dim_high = utils.resize_and_match(img_screenshot, self.img_tile, small_scale)
+                    result, template_high, dim_high = utils.resize_and_match(img_screenshot, self.img_tile_u, small_scale)
                     map_high = np.argwhere(result > threshold_high)
                     if map_high.any():
 
                         logging.info('precisely found "tile"')
 
-                        self.img_tile_scaled = template_high
+                        self.img_tile_scaled_u = template_high
                         self.dim_scaled.xy = dim_high
 
                         tiles_pos = map_high
@@ -226,3 +259,9 @@ class Grid:
 
         logging.warning('**NOT** roughly found "tile"')
         sys.exit()
+
+    def scale_tiles(self):
+        self.img_tile_scaled_t0 = cv2.resize(self.img_tile_t0, self.dim_scaled.xy)
+        self.img_tile_scaled_t1 = cv2.resize(self.img_tile_t1, self.dim_scaled.xy)
+        self.img_tile_scaled_t2 = cv2.resize(self.img_tile_t2, self.dim_scaled.xy)
+        self.img_tile_scaled_t3 = cv2.resize(self.img_tile_t3, self.dim_scaled.xy)
