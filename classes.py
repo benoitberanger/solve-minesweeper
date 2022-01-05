@@ -1,3 +1,4 @@
+import matplotlib.pyplot
 import numpy as np
 import pyautogui
 from PIL import ImageGrab
@@ -152,6 +153,30 @@ class Face(Image):
 
     def scale_face_ko(self):
         self.img_face_ko_scaled = cv2.resize(self.img_face_ko, self.dim_scaled.xy)
+
+    def capture(self):
+
+        # get raw image in rgb
+        bbox = (self.pos.y,
+                self.pos.x,
+                self.pos.y+self.dim_scaled.y,
+                self.pos.x+self.dim_scaled.x)
+        scr = ImageGrab.grab(bbox=bbox)
+        image_rgb = np.array(scr)
+
+        # convert rbg to grayscale
+        image_gs = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
+
+        # store previous screenshot & save 'dim' and 'center'
+        if self.img_curr.size != 0:
+            self.img_prev = self.img_curr
+        self.img_curr = image_gs
+
+    def check(self):
+        self.capture()
+        is_ok = utils.image_diff(self.img_curr, self.img_face_ok_scaled)
+        is_ko = utils.image_diff(self.img_curr, self.img_face_ko_scaled)
+        return is_ok > is_ko
 
 
 class Tile(Image):

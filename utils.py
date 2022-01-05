@@ -25,3 +25,11 @@ def resize_and_match(image, template, factor):
 def get_good_pos(array):
     array_clean = np.sort(np.unique(array))
     return array_clean
+
+
+def image_diff(img1, img2):
+    diff    = img1-img2
+    squared = diff**2
+    summed  = np.sum(squared)
+    # don't need to do sqrt
+    return summed

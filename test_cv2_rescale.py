@@ -43,4 +43,6 @@ logging.info('locating grid')
 grid.locate(screenshot.img_curr)
 grid.scale_tiles()
 
+state = face.check()
+
 quit()
