@@ -304,8 +304,8 @@ class Grid(Image):
         for idx_x in range(0,self.grid_size_h):
             for idx_y in range(0, self.grid_size_w):
                 tile_state = self.tiles_curr_state[idx_x, idx_y]
-                if not 0 or -1:
-                    result = self.__check_tile(idx_x, idx_y)
+                if np.isnan(tile_state):
+                    self.__check_tile(idx_x, idx_y)
 
     def __check_tile(self, idx_x, idx_y):
         tile_img = self.img_curr[
