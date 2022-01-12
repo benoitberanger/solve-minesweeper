@@ -272,10 +272,8 @@ class Grid(Image):
         sys.exit()
 
     def scale_tiles(self):
-        self.img_tile_scaled_t0 = cv2.resize(self.img_tile_t0, self.dim_scaled.xy)
-        self.img_tile_scaled_t1 = cv2.resize(self.img_tile_t1, self.dim_scaled.xy)
-        self.img_tile_scaled_t2 = cv2.resize(self.img_tile_t2, self.dim_scaled.xy)
-        self.img_tile_scaled_t3 = cv2.resize(self.img_tile_t3, self.dim_scaled.xy)
+        for sprite in self.list_sprite:
+            setattr(self, f'img_tile_scaled_{sprite}', cv2.resize(getattr(self, f'img_tile_{sprite}'), self.dim_scaled.xy))
 
     def capture(self):
 
@@ -302,3 +300,6 @@ class Grid(Image):
     def analyze(self):
 
         self.img_curr
+
+    def __check_tile(self, idx_x, idx_y):
+        pass
