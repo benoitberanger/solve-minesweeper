@@ -191,23 +191,16 @@ class Grid(Image):
         self.grid_size_h = empty_scalar
         self.grid_size_w = empty_scalar
 
-        self.fname_tile_u  = ''
-        self.fname_tile_t0 = ''
-        self.fname_tile_t1 = ''
-        self.fname_tile_t2 = ''
-        self.fname_tile_t3 = ''
-        self.img_tile_u  = np.ndarray([])
-        self.img_tile_t0 = np.ndarray([])
-        self.img_tile_t1 = np.ndarray([])
-        self.img_tile_t2 = np.ndarray([])
-        self.img_tile_t3 = np.ndarray([])
+        self.list_sprite = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8',
+                            'b', 'u', 'f',
+                            ]
+
+        for sprite in self.list_sprite:
+            setattr(self, f'fname_tile_{sprite}', '')
+            setattr(self, f'img_tile_{sprite}', np.ndarray([]))
+            setattr(self, f'img_tile_scaled_{sprite}', np.ndarray([]))
 
         self.dim_scaled = Point()
-        self.img_tile_scaled_u = np.ndarray([])
-        self.img_tile_scaled_t0 = np.ndarray([])
-        self.img_tile_scaled_t1 = np.ndarray([])
-        self.img_tile_scaled_t2 = np.ndarray([])
-        self.img_tile_scaled_t3 = np.ndarray([])
 
         self.tiles_prev_state = np.ndarray([])
         self.tiles_curr_state = np.ndarray([])
@@ -223,25 +216,9 @@ class Grid(Image):
         img_tile = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
         return img_tile
 
-    def load_tile_u(self, fname):
-        self.fname_tile_u = fname
-        self.img_tile_u =  self.__load_tile(fname)
-
-    def load_tile_t0(self, fname):
-        self.fname_tile_t0 = fname
-        self.img_tile_t0 = self.__load_tile(fname)
-
-    def load_tile_t1(self, fname):
-        self.fname_tile_t1 = fname
-        self.img_tile_t1 = self.__load_tile(fname)
-
-    def load_tile_t2(self, fname):
-        self.fname_tile_t2 = fname
-        self.img_tile_t2 = self.__load_tile(fname)
-
-    def load_tile_t3(self, fname):
-        self.fname_tile_t3 = fname
-        self.img_tile_t3 = self.__load_tile(fname)
+    def load_tile(self, fname, field):
+        setattr(self, f'fname_tile_{field}', fname)
+        setattr(self, f'img_tile_{field}', self.__load_tile(fname))
 
     def locate(self, img_screenshot, scales=np.arange(1, 10, 0.2), threshold_low=0.90, threshold_high=0.99):
 
@@ -284,7 +261,7 @@ class Grid(Image):
                         self.tiles_pos = np.ndarray([self.grid_size_h, self.grid_size_w], dtype=object)
                         for i in range(self.grid_size_h):
                             for j in range(self.grid_size_w):
-                                self.tiles_pos[i][j] = (tiles_h_clean[i], tiles_w_clean[j]) + tile_dim / 2
+                                self.tiles_pos[i][j] = Point( (tiles_h_clean[i], tiles_w_clean[j]) + tile_dim / 2 )
 
                         return
 
@@ -317,6 +294,10 @@ class Grid(Image):
         if self.img_curr.size != 0:
             self.img_prev = self.img_curr
         self.img_curr = image_gs
+
+    def click(self, idx_x, idx_y):
+        pos = self.tiles_pos[idx_x, idx_y]
+        pyautogui.click(pos.y, pos.x)
 
     def analyze(self):
 
