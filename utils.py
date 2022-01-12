@@ -24,7 +24,7 @@ def get_good_pos(array):
 
 
 def image_diff(img1, img2):
-    kernel_size = 3  # pixel
+    kernel_size = 5  # pixel
     img1_blured = cv2.blur(img1, (kernel_size, kernel_size))
     img2_blured = cv2.blur(img2, (kernel_size, kernel_size))
     # ncrop = 0  # pixel

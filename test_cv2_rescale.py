@@ -68,5 +68,6 @@ if not face.check():
 grid.capture()
 grid.analyze()
 print(grid.tiles_curr_state)
-
+plt.setp(plt.gcf().get_axes(), xticks=[], yticks=[]);
+plt.show()
 quit()

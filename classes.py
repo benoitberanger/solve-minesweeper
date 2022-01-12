@@ -134,7 +134,7 @@ class Face(Image):
         self.fname_face_ko = fname
         self.load(fname, 'img_face_ko')
 
-    def locate(self, img_screenshot, scales=np.arange(1,10,0.2), threshold_low=0.7, threshold_high=0.90):
+    def locate(self, img_screenshot, scales=np.arange(1,20,0.2), threshold_low=0.7, threshold_high=0.90):
 
         # small scale test
         for scale in scales:
@@ -239,7 +239,7 @@ class Grid(Image):
         setattr(self, f'fname_tile_{field}', fname)
         setattr(self, f'img_tile_{field}', self.__load_tile(fname))
 
-    def locate(self, img_screenshot, scales=np.arange(1, 10, 0.2), threshold_low=0.90, threshold_high=0.99):
+    def locate(self, img_screenshot, scales=np.arange(1, 20, 0.2), threshold_low=0.90, threshold_high=0.99):
 
         # small scale test
         for scale in scales:
@@ -332,6 +332,8 @@ class Grid(Image):
                    idx_x*self.dim_scaled.x:(idx_x+1)*self.dim_scaled.x,
                    idx_y*self.dim_scaled.y:(idx_y+1)*self.dim_scaled.y,
                    ]
+        plt.subplot(self.grid_size_h, self.grid_size_w, (idx_y + 1) + idx_x * self.grid_size_w)
+        plt.imshow(tile_img, cmap='gray', vmin=0, vmax=255)
         proba = [utils.image_diff(tile_img, getattr(self, f'img_tile_scaled_{sprite}')) for sprite in self.list_sprite]
         best_guess = self.list_value[np.argmin(proba)]
         self.tiles_curr_state[idx_x, idx_y] = best_guess
