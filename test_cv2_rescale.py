@@ -25,6 +25,7 @@ face.load_face_ko('media/face2.png')
 logging.info('locating face')
 face.locate(screenshot.img_curr)
 face.scale_face_ko()
+face.capture()
 
 # make sure it's reseted
 face.click()
@@ -42,7 +43,7 @@ grid.load_tile_t3('media/t3.png')
 logging.info('locating grid')
 grid.locate(screenshot.img_curr)
 grid.scale_tiles()
-
-state = face.check()
+grid.capture()
+grid.analyze()
 
 quit()

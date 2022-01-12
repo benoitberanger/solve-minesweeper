@@ -184,12 +184,12 @@ class Tile(Image):
         super().__init__()
 
 
-class Grid:
+class Grid(Image):
     def __init__(self):
+        super().__init__()
+
         self.grid_size_h = empty_scalar
         self.grid_size_w = empty_scalar
-
-        self.tiles_pos_2d = np.ndarray([])
 
         self.fname_tile_u  = ''
         self.fname_tile_t0 = ''
@@ -209,7 +209,10 @@ class Grid:
         self.img_tile_scaled_t2 = np.ndarray([])
         self.img_tile_scaled_t3 = np.ndarray([])
 
-        self.Tiles = np.ndarray([])
+        self.tiles_prev_state = np.ndarray([])
+        self.tiles_curr_state = np.ndarray([])
+        self.tiles_fov = (Point(), Point())
+        self.tiles_pos = np.ndarray([])
 
     def __repr__(self):
         return str(self.__dict__)
@@ -273,10 +276,16 @@ class Grid:
                         self.grid_size_w = len(tiles_w_clean)
                         logging.info(f'grid size = ({self.grid_size_h},{self.grid_size_w})')
 
-                        self.tiles_pos_2d = np.ndarray([self.grid_size_h, self.grid_size_w], dtype=object)
+                        self.tiles_prev_state = np.empty([self.grid_size_h, self.grid_size_w]).fill(np.nan)
+                        self.tiles_curr_state = self.tiles_prev_state
+                        self.tiles_fov[0].xy = (tiles_h_clean[ 0], tiles_w_clean[ 0])
+                        self.tiles_fov[1].xy = (tiles_h_clean[-1], tiles_w_clean[-1]) + tile_dim
+
+                        self.tiles_pos = np.ndarray([self.grid_size_h, self.grid_size_w], dtype=object)
                         for i in range(self.grid_size_h):
                             for j in range(self.grid_size_w):
-                                self.tiles_pos_2d[i][j] = (tiles_h_clean[i], tiles_w_clean[j]) + tile_dim / 2
+                                self.tiles_pos[i][j] = (tiles_h_clean[i], tiles_w_clean[j]) + tile_dim / 2
+
                         return
 
                 logging.warning('**NOT** precisely found "tile"')
@@ -290,3 +299,25 @@ class Grid:
         self.img_tile_scaled_t1 = cv2.resize(self.img_tile_t1, self.dim_scaled.xy)
         self.img_tile_scaled_t2 = cv2.resize(self.img_tile_t2, self.dim_scaled.xy)
         self.img_tile_scaled_t3 = cv2.resize(self.img_tile_t3, self.dim_scaled.xy)
+
+    def capture(self):
+
+        # get raw image in rgb
+        bbox = (self.tiles_fov[0].y,
+                self.tiles_fov[0].x,
+                self.tiles_fov[1].y,
+                self.tiles_fov[1].x)
+        scr = ImageGrab.grab(bbox=bbox)
+        image_rgb = np.array(scr)
+
+        # convert rbg to grayscale
+        image_gs = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
+
+        # store previous screenshot & save 'dim' and 'center'
+        if self.img_curr.size != 0:
+            self.img_prev = self.img_curr
+        self.img_curr = image_gs
+
+    def analyze(self):
+
+        self.img_curr
