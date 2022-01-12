@@ -194,6 +194,9 @@ class Grid(Image):
         self.list_sprite = ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7', 't8',
                             'b', 'u', 'f',
                             ]
+        self.list_value = [0, 1, 2, 3, 4, 5, 6, 7, 8,
+                           -1, np.nan, -2,
+                           ]
 
         for sprite in self.list_sprite:
             setattr(self, f'fname_tile_{sprite}', '')
@@ -253,7 +256,7 @@ class Grid(Image):
                         self.grid_size_w = len(tiles_w_clean)
                         logging.info(f'grid size = ({self.grid_size_h},{self.grid_size_w})')
 
-                        self.tiles_prev_state = np.empty([self.grid_size_h, self.grid_size_w]).fill(np.nan)
+                        self.tiles_prev_state = np.nan * np.empty([self.grid_size_h, self.grid_size_w])
                         self.tiles_curr_state = self.tiles_prev_state
                         self.tiles_fov[0].xy = (tiles_h_clean[ 0], tiles_w_clean[ 0])
                         self.tiles_fov[1].xy = (tiles_h_clean[-1], tiles_w_clean[-1]) + tile_dim
@@ -298,8 +301,17 @@ class Grid(Image):
         pyautogui.click(pos.y, pos.x)
 
     def analyze(self):
-
-        self.img_curr
+        for idx_x in range(0,self.grid_size_h):
+            for idx_y in range(0, self.grid_size_w):
+                tile_state = self.tiles_curr_state[idx_x, idx_y]
+                if not 0 or -1:
+                    result = self.__check_tile(idx_x, idx_y)
 
     def __check_tile(self, idx_x, idx_y):
-        pass
+        tile_img = self.img_curr[
+                   idx_x*self.dim_scaled.x:(idx_x+1)*self.dim_scaled.x,
+                   idx_y*self.dim_scaled.y:(idx_y+1)*self.dim_scaled.y,
+                   ]
+        proba = [utils.image_diff(tile_img, getattr(self, f'img_tile_scaled_{sprite}')) for sprite in self.list_sprite]
+        best_guess = self.list_value[np.argmin(proba)]
+        self.tiles_curr_state[idx_x, idx_y] = best_guess

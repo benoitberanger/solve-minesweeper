@@ -67,5 +67,6 @@ if not face.check():
     quit()
 grid.capture()
 grid.analyze()
+print(grid.tiles_curr_state)
 
 quit()
