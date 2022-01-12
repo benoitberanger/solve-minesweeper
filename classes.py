@@ -1,4 +1,3 @@
-import matplotlib.pyplot
 import numpy as np
 import pyautogui
 from PIL import ImageGrab
@@ -9,6 +8,8 @@ import logging
 import sys
 
 empty_scalar = np.empty([1, 1]).fill(np.nan)
+
+convert_grayscale = 1
 
 
 class Point:
@@ -76,9 +77,13 @@ class Image(Zone):
 
     def load(self, fname, prop_name):
         img_rgb = cv2.imread(fname)
-        img_gs = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
-        setattr(self, prop_name, img_gs)
-        self.dim.xy = img_gs.shape
+        if convert_grayscale:
+            img_gs = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+            img = img_gs
+        else:
+            img = img_rgb
+        setattr(self, prop_name, img)
+        self.dim.xy = img.shape[0:2]
 
 
 class Screenshot(Image):
@@ -91,16 +96,20 @@ class Screenshot(Image):
         scr = ImageGrab.grab()
         image_rgb = np.array(scr)
 
-        # convert rbg to grayscale
-        image_gs = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
+        if convert_grayscale:
+            # convert rbg to grayscale
+            image_gs = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
+            image = image_gs
+        else:
+            image = image_rgb
 
         # store previous screenshot & save 'dim' and 'center'
         if self.img_curr.size == 0:
-            self.dim.xy = image_gs.shape
+            self.dim.xy = image.shape[0:2]
             self.get_center()
         else:
             self.img_prev = self.img_curr
-        self.img_curr = image_gs
+        self.img_curr = image
 
     def get_center(self):
         self.center.xy = self.dim.xy/2
@@ -164,13 +173,17 @@ class Face(Image):
         scr = ImageGrab.grab(bbox=bbox)
         image_rgb = np.array(scr)
 
-        # convert rbg to grayscale
-        image_gs = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
+        if convert_grayscale:
+            # convert rbg to grayscale
+            image_gs = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
+            image = image_gs
+        else:
+            image = image_rgb
 
         # store previous screenshot & save 'dim' and 'center'
         if self.img_curr.size != 0:
             self.img_prev = self.img_curr
-        self.img_curr = image_gs
+        self.img_curr = image
 
     def check(self):
         self.capture()
@@ -216,7 +229,10 @@ class Grid(Image):
     @staticmethod
     def __load_tile(fname):
         img_rgb = cv2.imread(fname)
-        img_tile = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+        if convert_grayscale:
+            img_tile = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
+        else:
+            img_tile = img_rgb
         return img_tile
 
     def load_tile(self, fname, field):
@@ -288,13 +304,17 @@ class Grid(Image):
         scr = ImageGrab.grab(bbox=bbox)
         image_rgb = np.array(scr)
 
-        # convert rbg to grayscale
-        image_gs = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
+        if convert_grayscale:
+            # convert rbg to grayscale
+            image_gs = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2GRAY)
+            image = image_gs
+        else:
+            image = image_rgb
 
         # store previous screenshot & save 'dim' and 'center'
         if self.img_curr.size != 0:
             self.img_prev = self.img_curr
-        self.img_curr = image_gs
+        self.img_curr = image
 
     def click(self, idx_x, idx_y):
         pos = self.tiles_pos[idx_x, idx_y]

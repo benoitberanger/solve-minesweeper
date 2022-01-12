@@ -32,6 +32,7 @@ face.scale_face_ko()
 
 # make sure it's reseted
 face.click()
+screenshot.take_it()
 
 # grid location
 grid = Grid()
@@ -61,7 +62,6 @@ grid.click(
     round(grid.grid_size_h/2),
     round(grid.grid_size_w/2),
 )
-pyautogui.moveTo(0, 0)
 if not face.check():
     logging.error('lol, first random click we died...')
     quit()
